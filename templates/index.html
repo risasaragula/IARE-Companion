@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>IARE Companion</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+
+        <div class="brand">
+            <div class="brand-icon">I</div>
+
+            <div>
+                <h2>IARE</h2>
+                <span>Companion</span>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="#home" class="active">Home</a>
+            <a href="#features">Features</a>
+            <a href="/discover">Discover</a>
+        </div>
+
+    </nav>
+
+
+    <main id="home">
+
+        <!-- HERO -->
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="hero-tag">
+                    <span class="dot"></span>
+                    MADE FOR IARE STUDENTS
+                </div>
+
+                <h1>
+                    College life,
+                    <br>
+                    <span>made simpler.</span>
+                </h1>
+
+                <p>
+                    One place for the things you actually need -
+                    attendance, calculators, opportunities, placement prep and
+                    a little AI help when you're stuck.
+                </p>
+
+                <div class="hero-buttons">
+                    <button class="primary-btn" onclick="scrollToFeatures()">
+                        Explore features
+                        <span>→</span>
+                    </button>
+                </div>
+
+            </div>
+
+
+            <!-- HERO VISUAL (sample data) -->
+            <div class="hero-visual">
+
+                <div class="glow"></div>
+
+                <div class="main-card">
+
+                    <div class="mini-top">
+                        <span>YOUR DAY</span>
+                        <span class="live-dot">●</span>
+                    </div>
+
+                    <div class="big-number" id="heroOverall">
+                        78<span>.4%</span>
+                    </div>
+
+                    <p class="attendance-label">Overall attendance</p>
+
+                    <div class="progress">
+                        <div class="progress-fill" id="heroFill"></div>
+                    </div>
+
+                    <div class="attendance-row" id="heroSubjects">
+                        <div>
+                            <span>DBMS</span>
+                            <strong>82%</strong>
+                        </div>
+                        <div>
+                            <span>OS</span>
+                            <strong>76%</strong>
+                        </div>
+                        <div class="danger">
+                            <span>AI</span>
+                            <strong>68%</strong>
+                        </div>
+                    </div>
+
+                    <div class="warning-card" id="heroWarningCard">
+                        <span>⚠</span>
+                        <div>
+                            <strong id="heroWarnTitle">AI needs attention</strong>
+                            <small id="heroWarnText">Check how many classes you need</small>
+                        </div>
+                        <span>→</span>
+                    </div>
+
+                </div>
+
+                <div class="floating-chip chip-one">
+                    🧮
+                    <span>Calculators</span>
+                </div>
+
+                <div class="floating-chip chip-two">
+                    🎯
+                    <span>Opportunities</span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- FEATURES -->
+        <section class="features" id="features">
+
+            <div class="section-intro">
+                <div>
+                    <span class="section-tag">EVERYTHING YOU NEED</span>
+
+                    <h2>
+                        Built around
+                        <br>
+                        <span>student life.</span>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+
+                <!-- ATTENDANCE -->
+                <div class="feature-card attendance-card"
+                     onclick="window.location.href='/attendance'">
+
+                    <div class="card-top">
+                        <div class="feature-icon purple">📊</div>
+                        <span class="card-arrow">↗</span>
+                    </div>
+
+                    <div class="card-content">
+                        <span class="feature-number">01</span>
+                        <h3>Attendance</h3>
+                        <p>
+                            Know where you stand, how many
+                            classes you can miss and what you
+                            need to reach 75%.
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        Calculate your attendance
+                        <span>→</span>
+                    </div>
+
+                </div>
+
+
+                <!-- CALCULATORS -->
+                <div class="feature-card"
+                     onclick="window.location.href='/calculators'">
+
+                    <div class="card-top">
+                        <div class="feature-icon orange">🧮</div>
+                        <span class="card-arrow">↗</span>
+                    </div>
+
+                    <div class="card-content">
+                        <span class="feature-number">02</span>
+                        <h3>Calculators</h3>
+                        <p>
+                            SGPA, CGPA, percentage and
+                            marks-needed calculators —
+                            all in one place.
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        Calculate your marks
+                        <span>→</span>
+                    </div>
+
+                </div>
+
+
+                <!-- DISCOVER -->
+                <div class="feature-card"
+                     id="discover"
+                     onclick="window.location.href='/discover'">
+
+                    <div class="card-top">
+                        <div class="feature-icon blue">🎯</div>
+                        <span class="card-arrow">↗</span>
+                    </div>
+
+                    <div class="card-content">
+                        <span class="feature-number">03</span>
+                        <h3>Discover</h3>
+                        <p>
+                            Find internships, hackathons,
+                            competitions, workshops and
+                            placement opportunities.
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        Find your next opportunity
+                        <span>→</span>
+                    </div>
+
+                </div>
+
+
+                <!-- ASK IARE -->
+                <div class="feature-card ask-card"
+                     onclick="openAsk()">
+
+                    <div class="card-top">
+                        <div class="feature-icon dark">✦</div>
+                        <span class="card-arrow">↗</span>
+                    </div>
+
+                    <div class="card-content">
+                        <span class="feature-number">04</span>
+                        <h3>Ask IARE</h3>
+                        <p>
+                            Have a question? Ask about
+                            attendance, calculations,
+                            opportunities or IARE.
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        Ask your question
+                        <span>→</span>
+                    </div>
+
+                </div>
+                                <!-- PLACEMENT PREP -->
+                <div class="feature-card"
+                    style="grid-column: 1 / -1; min-height: 0;"
+                    onclick="window.location.href='/placement'">
+
+                    <div class="card-top">
+                        <div class="feature-icon orange">🎓</div>
+                        <span class="card-arrow">↗</span>
+                    </div>
+
+                    <div class="card-content">
+                        <span class="feature-number">05</span>
+                        <h3>Placement Prep</h3>
+                        <p>
+                            A simple checklist for DSA, projects, your resume
+                            and mock interviews, with a progress bar.
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        Start your checklist
+                        <span>→</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- BOTTOM CTA -->
+        <section class="bottom-cta">
+            <div>
+                <span class="section-tag">ONE PLACE</span>
+
+                <h2>
+                    Less searching.
+                    <br>
+                    More doing.
+                </h2>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <strong>IARE Companion</strong>
+            <span>Built for students, by students.</span>
+        </div>
+
+        <span>© 2026 IARE Companion</span>
+    </footer>
+
+
+    <!-- ASK IARE MODAL -->
+    <div class="modal-overlay"
+         id="askModal"
+         role="dialog"
+         aria-modal="true"
+         aria-hidden="true"
+         aria-labelledby="askTitle">
+
+        <div class="ask-modal">
+
+            <button class="close-btn"
+                    type="button"
+                    aria-label="Close"
+                    onclick="closeAsk()">
+                ×
+            </button>
+
+            <div class="ask-symbol">✦</div>
+
+            <span class="section-tag">AI ASSISTANT</span>
+
+            <h2 id="askTitle">Ask IARE</h2>
+
+            <p>Need help with something? Ask your question below.</p>
+
+            <div class="question-box">
+
+                <input id="questionInput"
+                       type="text"
+                       maxlength="500"
+                       placeholder="e.g. How many classes can I miss?">
+
+                <button type="button" aria-label="Ask" onclick="askQuestion()">
+                    →
+                </button>
+
+            </div>
+
+            <div class="suggestions">
+
+                <button type="button"
+                        onclick="fillQuestion('How many classes can I miss?')">
+                    📊 Attendance
+                </button>
+
+                <button type="button"
+                        onclick="fillQuestion('How do I calculate my CGPA?')">
+                    🧮 CGPA
+                </button>
+
+                <button type="button"
+                        onclick="fillQuestion('What opportunities are available?')">
+                    🎯 Opportunities
+                </button>
+
+            </div>
+
+            <div id="answerArea" class="answer-area">
+                <span>✦</span>
+                Ask something and your answer will appear here.
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</div>
+
+</body>
+</html>

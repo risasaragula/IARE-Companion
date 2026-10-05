@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculators | IARE Companion</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f7f8fc; color: #182230; }
+        nav { height: 70px; background: white; border-bottom: 1px solid #e8ebf0; display: flex; align-items: center; justify-content: space-between; padding: 0 7%; }
+        .brand { font-size: 21px; font-weight: 700; }
+        .back { color: #667085; text-decoration: none; font-size: 14px; }
+        .container { width: 86%; max-width: 1100px; margin: 42px auto; }
+        .heading { margin-bottom: 30px; }
+        .heading small { color: #d16b28; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+        .heading h1 { font-size: 36px; margin: 10px 0 8px; }
+        .heading p { color: #697386; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .card { background: white; border: 1px solid #e5e7eb; border-radius: 18px; padding: 25px; }
+        .card h2 { margin-bottom: 7px; }
+        .card p { color: #697386; font-size: 14px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; border: 1px solid #d5d9e0; border-radius: 9px; margin-bottom: 12px; font-size: 14px; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 9px; background: #182230; color: white; cursor: pointer; font-weight: 600; }
+        .add { background: #eef0f4; color: #344054; margin-bottom: 10px; }
+        .result { margin-top: 15px; background: #f4f5f8; border-radius: 10px; padding: 15px; font-size: 15px; line-height: 1.6; }
+        .result.error { background: #fff1f1; color: #b42318; }
+        .grade-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .grade-row input { margin-bottom: 0; }
+        @media (max-width: 750px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="brand">IARE Companion</div>
+    <a href="/" class="back">← Back to Home</a>
+</nav>
+
+<div class="container">
+
+    <div class="heading">
+        <small>CALCULATORS</small>
+        <h1>Do the math without the headache.</h1>
+        <p>Useful academic calculators for everyday college life.</p>
+    </div>
+
+    <div class="grid">
+
+        <!-- SGPA -->
+        <div class="card">
+            <h2>SGPA Calculator</h2>
+            <p>Enter your subject credits and grade points (0 to 10).</p>
+            <div id="sgpaRows">
+                <div class="grade-row">
+                    <input placeholder="Subject">
+                    <input type="number" class="credit" min="0" step="any" placeholder="Credits">
+                    <input type="number" class="point" min="0" max="10" step="any" placeholder="Grade point">
+                </div>
+            </div>
+            <button class="add" onclick="addSGPARow()">+ Add subject</button>
+            <button onclick="calculateSGPA()">Calculate SGPA</button>
+            <div id="sgpaResult"></div>
+        </div>
+
+        <!-- CGPA -->
+        <div class="card">
+            <h2>CGPA Calculator</h2>
+            <p>Calculate your CGPA from semester SGPAs and credits.</p>
+            <div id="cgpaRows">
+                <div class="grade-row">
+                    <input placeholder="Semester">
+                    <input type="number" class="semCredit" min="0" step="any" placeholder="Credits">
+                    <input type="number" class="semSGPA" min="0" max="10" step="any" placeholder="SGPA">
+                </div>
+            </div>
+            <button class="add" onclick="addCGPARow()">+ Add semester</button>
+            <button onclick="calculateCGPA()">Calculate CGPA</button>
+            <div id="cgpaResult"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function show(id, html, isError = false) {
+    $(id).innerHTML = `<div class="result${isError ? " error" : ""}">${html}</div>`;
+}
+
+// Returns a number, or null when the field is blank / not a number
+function num(el) {
+    const v = typeof el === "string" ? $(el).value : el.value;
+    if (v.trim() === "") return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+}
+
+// ---------- SGPA / CGPA (same weighted-average logic) ----------
+function weighted(creditSel, valueSel, label, resultId, resultText) {
+    const credits = [...document.querySelectorAll(creditSel)];
+    const values = [...document.querySelectorAll(valueSel)];
+    let totalCredits = 0, total = 0;
+
+    for (let i = 0; i < credits.length; i++) {
+        const c = num(credits[i]);
+        const v = num(values[i]);
+
+        if (c === null && v === null) continue;           // empty row, ignore
+
+        if (c === null || v === null) {
+            return show(resultId, `Row ${i + 1}: enter both credits and ${label}.`, true);
+        }
+        if (c === 0) continue;                            // 0-credit subjects don't count
+        if (c < 0 || v < 0 || v > 10) {
+            return show(resultId, `Row ${i + 1}: credits must be above 0 and ${label} between 0 and 10.`, true);
+        }
+        totalCredits += c;
+        total += c * v;
+    }
+
+    if (totalCredits === 0) {
+        return show(resultId, `Enter your credits and ${label}.`, true);
+    }
+    show(resultId, `${resultText} <strong>${(total / totalCredits).toFixed(2)}</strong>`);
+}
+
+function addSGPARow() {
+    $("sgpaRows").insertAdjacentHTML("beforeend", `
+        <div class="grade-row">
+            <input placeholder="Subject">
+            <input type="number" class="credit" min="0" step="any" placeholder="Credits">
+            <input type="number" class="point" min="0" max="10" step="any" placeholder="Grade point">
+        </div>`);
+}
+
+function addCGPARow() {
+    $("cgpaRows").insertAdjacentHTML("beforeend", `
+        <div class="grade-row">
+            <input placeholder="Semester">
+            <input type="number" class="semCredit" min="0" step="any" placeholder="Credits">
+            <input type="number" class="semSGPA" min="0" max="10" step="any" placeholder="SGPA">
+        </div>`);
+}
+
+function calculateSGPA() {
+    weighted(".credit", ".point", "grade point", "sgpaResult", "Your SGPA is");
+}
+
+function calculateCGPA() {
+    weighted(".semCredit", ".semSGPA", "SGPA", "cgpaResult", "Your CGPA is");
+}
+</script>
+
+</body>
+</html>

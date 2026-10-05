@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Prep | IARE Companion</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f7f8fc; color: #182230; }
+        nav { height: 70px; background: white; border-bottom: 1px solid #e8ebf0; display: flex; align-items: center; justify-content: space-between; padding: 0 7%; }
+        .brand { font-size: 21px; font-weight: 700; }
+        .back { color: #667085; text-decoration: none; font-size: 14px; }
+        .container { width: 86%; max-width: 1100px; margin: 42px auto; }
+        .heading { margin-bottom: 30px; }
+        .heading small { color: #7562db; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+        .heading h1 { font-size: 36px; margin: 10px 0 8px; }
+        .heading p { color: #697386; line-height: 1.5; }
+
+        /* Overall progress */
+        .overall { background: white; border: 1px solid #e5e7eb; border-radius: 18px; padding: 25px; margin-bottom: 18px; }
+        .overall-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+        .big { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+        .done-text { color: #697386; font-size: 14px; }
+        .bar { height: 10px; background: #eceaf3; border-radius: 10px; overflow: hidden; margin-top: 14px; }
+        .bar > div { height: 100%; width: 0; background: #7562db; border-radius: 10px; transition: width .3s; }
+        .msg { color: #697386; font-size: 14px; margin-top: 12px; }
+        .next { display: none; margin-top: 12px; font-size: 14px; line-height: 1.5; background: #f4f2ff; border-radius: 10px; padding: 10px 12px; }
+
+        /* Sections */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+        .card { background: white; border: 1px solid #e5e7eb; border-radius: 18px; padding: 22px; }
+        .card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .card-head h2 { font-size: 19px; }
+        .count { font-size: 13px; color: #697386; font-weight: 700; white-space: nowrap; }
+        .hint { color: #697386; font-size: 13px; line-height: 1.5; margin: 6px 0 12px; }
+        .mini { height: 6px; background: #eceaf3; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+        .mini > div { height: 100%; width: 0; background: #7562db; border-radius: 10px; transition: width .3s; }
+
+        .item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 8px; border-radius: 9px; cursor: pointer; }
+        .item:hover { background: #f7f8fc; }
+        .item input[type="checkbox"] { width: 20px; height: 20px; margin-top: 1px; accent-color: #7562db; flex-shrink: 0; cursor: pointer; }
+        .item span { flex: 1; font-size: 14px; line-height: 1.45; }
+        .item.done span { color: #9aa1ad; text-decoration: line-through; }
+        .del { background: none; border: none; color: #9aa1ad; font-size: 20px; line-height: 1; cursor: pointer; padding: 0 4px; }
+        .del:hover { color: #b42318; }
+
+        .add-row { display: flex; gap: 8px; margin-top: 12px; }
+        .add-row input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #d5d9e0; border-radius: 9px; font-size: 14px; }
+        .add-row button { padding: 10px 16px; border: none; border-radius: 9px; background: #182230; color: white; font-weight: 600; cursor: pointer; }
+
+        .footer-row { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .footer-row p { color: #9aa1ad; font-size: 12px; }
+        .reset { background: none; border: 1px solid #d5d9e0; color: #697386; padding: 10px 14px; border-radius: 9px; cursor: pointer; font-size: 13px; }
+        .reset:hover { border-color: #b42318; color: #b42318; }
+
+        @media (max-width: 750px) {
+            .grid { grid-template-columns: 1fr; }
+            .heading h1 { font-size: 30px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="brand">IARE Companion</div>
+    <a href="/" class="back">← Back to Home</a>
+</nav>
+
+<div class="container">
+
+    <div class="heading">
+        <small>PLACEMENT PREP</small>
+        <h1>One checklist. No stress.</h1>
+        <p>Tick things off as you finish them. Your progress is saved on this device, and you don't need to log in.</p>
+    </div>
+
+    <div class="overall">
+        <div class="overall-top">
+            <div class="big" id="pct">0%</div>
+            <div class="done-text" id="doneText"></div>
+        </div>
+        <div class="bar"><div id="overallFill"></div></div>
+        <div class="msg" id="msg"></div>
+        <div class="next" id="next"></div>
+    </div>
+
+    <div class="grid" id="sections"></div>
+
+    <div class="footer-row">
+        <p>Tip: do one small item every day instead of a lot in one night.</p>
+        <button class="reset" id="resetBtn" type="button">Clear all ticks</button>
+    </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// You can edit this list. Keep every id unique and never reuse an old one.
+const SECTIONS = [
+    {
+        key: "dsa", icon: "🧩", title: "DSA topics",
+        hint: "Learn the idea first, then solve 3 to 5 problems on each topic.",
+        items: [
+            ["dsa1", "Arrays and strings"],
+            ["dsa2", "Hashing (maps and sets)"],
+            ["dsa3", "Two pointers and sliding window"],
+            ["dsa4", "Sorting and binary search"],
+            ["dsa5", "Recursion and backtracking"],
+            ["dsa6", "Linked lists"],
+            ["dsa7", "Stacks and queues"],
+            ["dsa8", "Trees and binary search trees"],
+            ["dsa9", "Graphs (BFS and DFS)"],
+            ["dsa10", "Dynamic programming basics"],
+            ["dsa11", "Greedy problems"],
+            ["dsa12", "Heaps (priority queue)"]
+        ]
+    },
+    {
+        key: "projects", icon: "🛠️", title: "Projects",
+        hint: "Two good projects you can explain well beat five you can't.",
+        items: [
+            ["pr1", "Pick 2 or 3 projects (at least one with a database)"],
+            ["pr2", "Put the code on GitHub with a clear README"],
+            ["pr3", "Deploy one project so it has a live link"],
+            ["pr4", "Write 3 lines for each: the problem, the tech, your part"],
+            ["pr5", "Be ready to explain every design choice and trade-off"],
+            ["pr6", "Add a result or number to each project (users, speed, accuracy)"]
+        ]
+    },
+    {
+        key: "resume", icon: "📄", title: "Resume",
+        hint: "Recruiters spend seconds on it. Keep it short and clear.",
+        items: [
+            ["rs1", "Keep it to one page"],
+            ["rs2", "Add email, phone, GitHub and LinkedIn links"],
+            ["rs3", "Education with your CGPA"],
+            ["rs4", "Skills grouped (languages, tools, subjects)"],
+            ["rs5", "2 or 3 projects with short bullet points"],
+            ["rs6", "Internships, certificates and achievements"],
+            ["rs7", "Check spelling, then save as PDF"],
+            ["rs8", "Ask a senior or friend to review it"]
+        ]
+    },
+    {
+        key: "mock", icon: "🎤", title: "Mock interviews",
+        hint: "Practising out loud is the fastest way to stop feeling nervous.",
+        items: [
+            ["mk1", "Practise \"Tell me about yourself\" in 60 seconds"],
+            ["mk2", "Solve 3 coding problems out loud while someone watches"],
+            ["mk3", "Do 1 coding mock with a friend or senior"],
+            ["mk4", "Do 1 HR mock (strengths, weaknesses, why this company)"],
+            ["mk5", "Revise basics: OOP, DBMS, OS and networks"],
+            ["mk6", "Take one timed aptitude or coding test online"],
+            ["mk7", "Prepare 2 questions to ask the interviewer"],
+            ["mk8", "Write down what went wrong in each mock and fix it"]
+        ]
+    }
+];
+
+const STORE = "iare_placement_prep";
+const state = { done: {}, custom: {} };
+
+// ---------- load / save (works even if storage is blocked) ----------
+try {
+    const saved = JSON.parse(localStorage.getItem(STORE));
+    if (saved && typeof saved === "object") {
+        if (saved.done && typeof saved.done === "object") state.done = saved.done;
+        if (saved.custom && typeof saved.custom === "object") {
+            for (const key of Object.keys(saved.custom)) {
+                if (!Array.isArray(saved.custom[key])) continue;
+                state.custom[key] = saved.custom[key].filter(i =>
+                    i && typeof i.id === "string" && typeof i.text === "string");
+            }
+        }
+    }
+} catch (e) { /* start fresh */ }
+
+function save() {
+    try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* ignore */ }
+}
+
+// ---------- helpers ----------
+function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+}
+
+function itemsFor(sec) {
+    const base = sec.items.map(([id, text]) => ({ id, text, custom: false }));
+    const mine = (state.custom[sec.key] || []).map(i => ({ id: i.id, text: i.text, custom: true }));
+    return [...base, ...mine];
+}
+
+function message(pct) {
+    if (pct === 0) return "Start with one small item today.";
+    if (pct < 25) return "Good start. Keep going.";
+    if (pct < 50) return "You're building momentum.";
+    if (pct < 75) return "More than halfway there.";
+    if (pct < 100) return "Almost there. Finish strong.";
+    return "Everything is done. Go ace those interviews! 🎉";
+}
+
+// ---------- rendering ----------
+const refs = {};
+
+function rowFor(item, sec) {
+    const label = el("label", "item" + (state.done[item.id] ? " done" : ""));
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    box.checked = !!state.done[item.id];
+
+    box.addEventListener("change", () => {
+        if (box.checked) state.done[item.id] = true;
+        else delete state.done[item.id];
+        label.classList.toggle("done", box.checked);
+        save();
+        updateProgress();
+    });
+
+    label.append(box, el("span", "", item.text));
+
+    if (item.custom) {
+        const del = el("button", "del", "×");
+        del.type = "button";
+        del.title = "Remove";
+        del.setAttribute("aria-label", "Remove " + item.text);
+        del.addEventListener("click", e => {
+            e.preventDefault();
+            state.custom[sec.key] = state.custom[sec.key].filter(i => i.id !== item.id);
+            delete state.done[item.id];
+            save();
+            render();
+        });
+        label.append(del);
+    }
+    return label;
+}
+
+function render() {
+    const root = $("sections");
+    root.textContent = "";
+
+    SECTIONS.forEach(sec => {
+        const card = el("div", "card");
+
+        const head = el("div", "card-head");
+        const count = el("span", "count");
+        head.append(el("h2", "", sec.icon + " " + sec.title), count);
+
+        const mini = el("div", "mini");
+        const fill = document.createElement("div");
+        mini.append(fill);
+
+        card.append(head, el("p", "hint", sec.hint), mini);
+
+        const list = el("div", "list");
+        itemsFor(sec).forEach(item => list.append(rowFor(item, sec)));
+        card.append(list);
+
+        // add your own item
+        const row = el("div", "add-row");
+        const input = document.createElement("input");
+        input.placeholder = "Add your own item";
+        input.maxLength = 80;
+        const btn = el("button", "", "Add");
+        btn.type = "button";
+
+        const add = () => {
+            const text = input.value.trim();
+            if (!text) return;
+            (state.custom[sec.key] = state.custom[sec.key] || []).push({
+                id: "c" + Date.now() + Math.floor(Math.random() * 1000),
+                text
+            });
+            save();
+            render();
+        };
+        btn.addEventListener("click", add);
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") { e.preventDefault(); add(); }
+        });
+
+        row.append(input, btn);
+        card.append(row);
+        root.append(card);
+
+        refs[sec.key] = { count, fill };
+    });
+
+    updateProgress();
+}
+
+function updateProgress() {
+    let total = 0, done = 0, next = null;
+
+    SECTIONS.forEach(sec => {
+        const items = itemsFor(sec);
+        const d = items.filter(i => state.done[i.id]).length;
+        total += items.length;
+        done += d;
+
+        if (!next) {
+            const n = items.find(i => !state.done[i.id]);
+            if (n) next = { sec, item: n };
+        }
+
+        const r = refs[sec.key];
+        r.count.textContent = d + " / " + items.length;
+        r.fill.style.width = (items.length ? d / items.length * 100 : 0) + "%";
+    });
+
+    const pct = total ? Math.round(done / total * 100) : 0;
+    $("pct").textContent = pct + "%";
+    $("doneText").textContent = done + " of " + total + " done";
+    $("overallFill").style.width = pct + "%";
+    $("msg").textContent = message(pct);
+
+    const nextBox = $("next");
+    if (next) {
+        nextBox.textContent = "Next up (" + next.sec.title + "): " + next.item.text;
+        nextBox.style.display = "block";
+    } else {
+        nextBox.style.display = "none";
+    }
+}
+
+$("resetBtn").addEventListener("click", () => {
+    if (!confirm("Clear all ticks? Items you added yourself will stay.")) return;
+    state.done = {};
+    save();
+    render();
+});
+
+render();
+</script>
+
+</body>
+</html>

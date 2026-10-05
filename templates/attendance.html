@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance | IARE Companion</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f7f8fc; color: #222; min-height: 100vh; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 25px; }
+        .back-link { display: inline-block; margin-bottom: 25px; color: #555; text-decoration: none; font-size: 14px; }
+        .back-link:hover { color: #111; }
+        h1 { font-size: 36px; margin-bottom: 10px; }
+        .subtitle { color: #666; margin-bottom: 30px; font-size: 16px; }
+        .upload-card, .overall-card { background: white; border-radius: 18px; padding: 30px; box-shadow: 0 8px 30px rgba(0,0,0,.06); }
+        .upload-card { margin-bottom: 30px; }
+        .upload-label { display: block; border: 2px dashed #cfd3dc; border-radius: 14px; padding: 35px; text-align: center; cursor: pointer; transition: .2s; }
+        .upload-label:hover { border-color: #777; background: #fafafa; }
+        .upload-icon { font-size: 40px; margin-bottom: 10px; }
+        .upload-label strong { display: block; font-size: 18px; margin-bottom: 6px; }
+        .upload-label span { color: #777; font-size: 14px; }
+        #attendance_image { display: none; }
+        #preview { width: 100%; max-height: 500px; object-fit: contain; margin-top: 20px; border-radius: 12px; display: none; border: 1px solid #ddd; }
+        .analyze-btn { width: 100%; margin-top: 20px; padding: 14px; border: none; border-radius: 10px; background: #111; color: white; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .analyze-btn:hover { background: #333; }
+        .analyze-btn:disabled { background: #aaa; cursor: not-allowed; }
+        #status { margin-top: 15px; text-align: center; color: #666; font-size: 14px; }
+        #status.error { color: #d9534f; }
+        #result { display: none; }
+        .section-title { font-size: 22px; font-weight: 700; margin: 30px 0 15px; }
+        .section-subtitle { margin-top: -10px; margin-bottom: 20px; color: #666; font-size: 14px; line-height: 1.5; }
+        .overall-card { text-align: center; }
+        .overall-number { font-size: 48px; font-weight: 800; margin-bottom: 10px; }
+        .overall-message { color: #666; font-size: 15px; }
+        .subject-card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 12px; box-shadow: 0 5px 20px rgba(0,0,0,.05); }
+        .subject-top { display: flex; justify-content: space-between; gap: 15px; align-items: flex-start; }
+        .subject-name { font-size: 17px; font-weight: 700; }
+        .subject-code { font-size: 13px; color: #888; margin-top: 4px; }
+        .subject-percentage { font-size: 20px; font-weight: 700; white-space: nowrap; }
+        .subject-details { margin-top: 12px; font-size: 14px; color: #666; line-height: 1.6; }
+        .risk-card { border-left: 5px solid #d9534f; }
+        .priority-card { border-left: 5px solid #f0ad4e; }
+        .safe-card { border-left: 5px solid #5cb85c; }
+        .empty-message { background: white; border-radius: 14px; padding: 20px; color: #666; text-align: center; }
+
+        /* What-if */
+        .whatif-card select, .whatif-card input { display: block; width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #d5d9e0; border-radius: 9px; font-size: 14px; background: white; color: #222; }
+        .whatif-card .analyze-btn { margin-top: 4px; }
+        .whatif-result { display: none; margin-top: 15px; background: #f4f5f8; border-radius: 10px; padding: 15px; font-size: 15px; line-height: 1.7; }
+
+        @media (max-width: 600px) {
+            .container { padding: 25px 15px; }
+            h1 { font-size: 30px; }
+            .upload-card { padding: 20px; }
+            .subject-top { flex-direction: column; }
+            .subject-percentage { font-size: 18px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <a href="/" class="back-link">← Back to IARE Companion</a>
+    <h1>Attendance</h1>
+    <p class="subtitle">Upload your attendance screenshot and let IARE Companion analyze it.</p>
+
+    <div class="upload-card">
+        <label for="attendance_image" class="upload-label">
+            <div class="upload-icon">📸</div>
+            <strong>Upload Attendance Screenshot</strong>
+            <span>Upload your Samvidha attendance screenshot (include the table header)</span>
+        </label>
+
+        <input type="file" id="attendance_image" accept="image/*">
+        <img id="preview" alt="Attendance preview">
+
+        <button class="analyze-btn" id="analyzeBtn" disabled>🔍 Analyze Attendance</button>
+        <div id="status"></div>
+    </div>
+
+    <div id="result">
+
+        <div class="section-title">📊 Overall Attendance</div>
+        <div class="overall-card">
+            <div class="overall-number" id="overallNumber">--</div>
+            <div class="overall-message" id="overallMessage"></div>
+        </div>
+
+        <div class="section-title">🔮 What-if Calculator</div>
+        <div class="upload-card whatif-card">
+            <select id="whatifSubject">
+                <option value="all">Overall</option>
+            </select>
+            <input type="number" id="whatifAttend" min="0" placeholder="Classes you will attend">
+            <input type="number" id="whatifMiss" min="0" placeholder="Classes you will miss">
+            <button class="analyze-btn" id="whatifBtn" type="button">Calculate</button>
+            <div class="whatif-result" id="whatifResult"></div>
+        </div>
+
+        <div class="section-title">⚠️ Subjects at Risk</div>
+        <div id="riskSubjects"></div>
+
+        <div class="section-title">🚀 Attend These First</div>
+        <p class="section-subtitle">These subjects gain the most attendance from each class you attend.</p>
+        <div id="prioritySubjects"></div>
+
+        <div class="section-title">📚 All Subjects</div>
+        <div id="allSubjects"></div>
+
+    </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fileInput = $("attendance_image");
+const preview = $("preview");
+const analyzeBtn = $("analyzeBtn");
+const statusText = $("status");
+const result = $("result");
+
+let lastSubjects = [];
+
+const esc = s => String(s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function setStatus(text, isError = false) {
+    statusText.textContent = text;
+    statusText.className = isError ? "error" : "";
+}
+
+function tip(s) {
+    if (s.conducted === 0) return "No attendance recorded";
+    if (s.need > 0) return `Attend the next <b>${s.need}</b> classes in a row to reach 75%`;
+    if (s.can_miss > 0) return `You can miss up to <b>${s.can_miss}</b> more classes and stay at 75%`;
+    return "Right at the 75% line. Don't miss the next class.";
+}
+
+function card(s, cls, details) {
+    const pct = s.conducted > 0 ? s.percentage.toFixed(2) + "%" : "--";
+    return `
+        <div class="subject-card ${cls}">
+            <div class="subject-top">
+                <div>
+                    <div class="subject-name">${esc(s.name)}</div>
+                    <div class="subject-code">${esc(s.code)}</div>
+                </div>
+                <div class="subject-percentage">${pct}</div>
+            </div>
+            <div class="subject-details">${details}</div>
+        </div>`;
+}
+
+function fill(id, items, emptyText, build) {
+    $(id).innerHTML = items.length
+        ? items.map(build).join("")
+        : `<div class="empty-message">${emptyText}</div>`;
+}
+
+// ---------- file selection ----------
+fileInput.addEventListener("change", function () {
+    const file = this.files[0];
+    if (!file) {
+        analyzeBtn.disabled = true;
+        preview.style.display = "none";
+        return;
+    }
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+    analyzeBtn.disabled = false;
+    setStatus("Screenshot ready to analyze.");
+});
+
+// ---------- analyze ----------
+analyzeBtn.addEventListener("click", async function () {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    analyzeBtn.disabled = true;
+    result.style.display = "none";
+    setStatus("🔍 Reading your attendance...");
+
+    const formData = new FormData();
+    formData.append("attendance_image", file);
+
+    try {
+        const response = await fetch("/upload-attendance", { method: "POST", body: formData });
+        const data = await response.json();
+
+        if (!data.success) {
+            setStatus(data.message || "Could not analyze the screenshot.", true);
+            return;
+        }
+
+        // Overall
+        if (data.overall === null) {
+            $("overallNumber").textContent = "--";
+            $("overallMessage").textContent = "Couldn't calculate your overall attendance.";
+        } else {
+            $("overallNumber").textContent = data.overall + "%";
+            $("overallMessage").textContent = data.overall >= 75
+                ? "Your overall attendance is currently above 75%."
+                : "Your overall attendance is below the 75% requirement.";
+        }
+
+        // What-if dropdown
+        lastSubjects = data.subjects.filter(s => s.conducted > 0);
+        try {
+            localStorage.setItem("iare_attendance",
+                JSON.stringify({ overall: data.overall, subjects: data.subjects }));
+        } catch (e) { /* storage unavailable, Ask IARE just won't see it */ }
+        $("whatifSubject").innerHTML =
+            `<option value="all">Overall</option>` +
+            lastSubjects.map((s, i) => `<option value="${i}">${esc(s.name)}</option>`).join("");
+        $("whatifResult").style.display = "none";
+
+        // Sections
+        fill("riskSubjects", data.risk, "🎉 No subjects are currently below 75%.",
+            s => card(s, "risk-card", `${s.attended}/${s.conducted} classes attended<br>${tip(s)}`));
+
+        fill("prioritySubjects", data.priority, "No subject data available.",
+            s => card(s, "priority-card",
+                `Current: ${s.attended}/${s.conducted}<br>
+                 After attending one class: ${s.after_one.toFixed(2)}%<br>
+                 If you miss the next one: ${s.after_miss.toFixed(2)}%<br>
+                 Improvement: +${s.improvement.toFixed(2)} percentage points`));
+
+        fill("allSubjects", data.subjects, "No subjects found.",
+            s => card(s, s.conducted === 0 ? "" : (s.percentage < 75 ? "risk-card" : "safe-card"),
+                s.conducted > 0 ? `${s.attended}/${s.conducted} classes attended<br>${tip(s)}`
+                                : "No attendance recorded"));
+
+        result.style.display = "block";
+        setStatus("✅ Attendance analyzed successfully.");
+    } catch (error) {
+        console.error(error);
+        setStatus("❌ Something went wrong while analyzing the screenshot.", true);
+    } finally {
+        analyzeBtn.disabled = false;
+    }
+});
+
+// ---------- what-if ----------
+$("whatifBtn").addEventListener("click", () => {
+    if (!lastSubjects.length) return;
+
+    const attend = Math.max(0, parseInt($("whatifAttend").value) || 0);
+    const miss = Math.max(0, parseInt($("whatifMiss").value) || 0);
+    const pick = $("whatifSubject").value;
+    const pool = pick === "all" ? lastSubjects : [lastSubjects[Number(pick)]];
+
+    const a = pool.reduce((t, s) => t + s.attended, 0);
+    const c = pool.reduce((t, s) => t + s.conducted, 0);
+    const before = a / c * 100;
+    const after = (a + attend) / (c + attend + miss) * 100;
+
+    const box = $("whatifResult");
+    box.style.display = "block";
+    box.innerHTML =
+        `Now: <b>${before.toFixed(2)}%</b> (${a}/${c})<br>
+         After: <b>${after.toFixed(2)}%</b> (${a + attend}/${c + attend + miss})<br>
+         ${after >= 75 ? "✅ You would be at or above 75%." : "⚠️ You would still be below 75%."}`;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover | IARE Companion</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f7f8fc; color: #182230; }
+        nav { height: 70px; background: white; border-bottom: 1px solid #e8ebf0; display: flex; align-items: center; justify-content: space-between; padding: 0 7%; }
+        .brand { font-size: 21px; font-weight: 700; }
+        .back { color: #667085; text-decoration: none; font-size: 14px; }
+        .container { width: 86%; max-width: 1100px; margin: 42px auto; }
+        .heading { margin-bottom: 30px; }
+        .heading small { color: #3867d6; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+        .heading h1 { font-size: 36px; margin: 10px 0 8px; }
+        .heading p { color: #697386; }
+
+        .categories { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .category { background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 22px; cursor: pointer; transition: .2s; }
+        .category:hover, .category.active { transform: translateY(-3px); border-color: #3867d6; }
+        .icon { font-size: 27px; margin-bottom: 15px; }
+        .category h2 { font-size: 18px; margin-bottom: 7px; }
+        .category p { color: #697386; font-size: 13px; line-height: 1.5; }
+
+        .opportunities { margin-top: 25px; display: none; }
+        .opportunities > h2 { margin-bottom: 6px; }
+        .note { color: #697386; font-size: 13px; margin-bottom: 15px; line-height: 1.5; }
+        .opportunity { background: white; border: 1px solid #e5e7eb; border-radius: 14px; padding: 18px; margin-bottom: 10px; }
+        .opportunity h3 { margin-bottom: 6px; }
+        .opportunity p { color: #697386; font-size: 14px; line-height: 1.5; }
+        .tag { display: inline-block; background: #eef1f6; padding: 5px 8px; border-radius: 6px; font-size: 11px; margin-top: 10px; margin-right: 8px; }
+        .visit { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 600; color: #3867d6; text-decoration: none; }
+        .visit:hover { text-decoration: underline; }
+
+        @media (max-width: 800px) { .categories { grid-template-columns: 1fr; } }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="brand">IARE Companion</div>
+    <a href="/" class="back">← Back to Home</a>
+</nav>
+
+<div class="container">
+
+    <div class="heading">
+        <small>DISCOVER</small>
+        <h1>Find what's worth applying for.</h1>
+        <p>Trusted places to look for opportunities students usually don't want to miss.</p>
+    </div>
+
+    <div class="categories" id="categories"></div>
+
+    <div id="opportunities" class="opportunities"></div>
+
+</div>
+
+<script>
+const categories = [
+    { name: "Internships", icon: "💼", text: "Industry experience, internships and student roles." },
+    { name: "Hackathons", icon: "💻", text: "Build something, compete and meet other developers." },
+    { name: "Competitions", icon: "🏆", text: "Technical and non-technical competitions." },
+    { name: "Workshops", icon: "🛠️", text: "Learn new tools, technologies and practical skills." },
+    { name: "Scholarships", icon: "🎓", text: "Financial support and student scholarship opportunities." },
+    { name: "Placements", icon: "🚀", text: "Placement drives and opportunities worth tracking." }
+];
+
+// Official platforms. Deadlines change, so always confirm on the site itself.
+// To add a real opportunity later, add { title, description, tag, link, deadline }.
+const data = {
+    Internships: [
+        { title: "Internshala", description: "Large platform for internships and fresher jobs, with filters for work-from-home and location.", tag: "PLATFORM", link: "https://internshala.com" },
+        { title: "Unstop", description: "Internships, jobs, competitions and quizzes for students in one place.", tag: "PLATFORM", link: "https://unstop.com" }
+    ],
+    Hackathons: [
+        { title: "Smart India Hackathon", description: "Government-run national hackathon where students solve real problem statements.", tag: "NATIONAL", link: "https://www.sih.gov.in" },
+        { title: "Devpost", description: "Browse online hackathons from around the world and join as a team or alone.", tag: "PLATFORM", link: "https://devpost.com/hackathons" }
+    ],
+    Competitions: [
+        { title: "Unstop competitions", description: "Coding contests, case studies, quizzes and design challenges from colleges and companies.", tag: "PLATFORM", link: "https://unstop.com/competitions" }
+    ],
+    Workshops: [
+        { title: "NPTEL", description: "Free and low-cost courses from IITs and IISc, with optional certification exams.", tag: "COURSES", link: "https://nptel.ac.in" },
+        { title: "Your department notices", description: "Workshops and guest lectures at IARE are usually announced by your department and clubs. Check notice boards and student groups.", tag: "COLLEGE" }
+    ],
+    Scholarships: [
+        { title: "National Scholarship Portal", description: "Government portal for central and state scholarship schemes. Check eligibility and last dates for each scheme.", tag: "GOVERNMENT", link: "https://scholarships.gov.in" }
+    ],
+    Placements: [
+        { title: "College placement cell", description: "Placement drives, eligibility and registration at IARE are handled by the training and placement cell. Ask them for the current schedule.", tag: "COLLEGE" },
+        { title: "Unstop jobs", description: "Off-campus job and hiring challenges to track alongside campus drives.", tag: "PLATFORM", link: "https://unstop.com/jobs" }
+    ]
+};
+
+const esc = s => String(s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const catBox = document.getElementById("categories");
+catBox.innerHTML = categories.map(c => `
+    <div class="category" data-name="${esc(c.name)}">
+        <div class="icon">${c.icon}</div>
+        <h2>${esc(c.name)}</h2>
+        <p>${esc(c.text)}</p>
+    </div>`).join("");
+
+catBox.addEventListener("click", e => {
+    const card = e.target.closest(".category");
+    if (card) showCategory(card.dataset.name);
+});
+
+function showCategory(category) {
+    document.querySelectorAll(".category").forEach(c =>
+        c.classList.toggle("active", c.dataset.name === category));
+
+    const container = document.getElementById("opportunities");
+    container.style.display = "block";
+
+    const items = data[category].map(item => `
+        <div class="opportunity">
+            <h3>${esc(item.title)}</h3>
+            <p>${esc(item.description)}</p>
+            <span class="tag">${esc(item.tag)}</span>
+            ${item.deadline ? `<span class="tag">Deadline: ${esc(item.deadline)}</span>` : ""}
+            ${item.link ? `<br><a class="visit" href="${esc(item.link)}" target="_blank" rel="noopener noreferrer">Visit site →</a>` : ""}
+        </div>`).join("");
+
+    container.innerHTML = `
+        <h2>${esc(category)}</h2>
+        <p class="note">Always confirm deadlines and eligibility on the official page before applying.</p>
+        ${items}`;
+
+    container.scrollIntoView({ behavior: "smooth" });
+}
+</script>
+
+</body>
+</html>
