@@ -17,6 +17,11 @@
         .heading h1 { font-size: 36px; margin: 10px 0 8px; }
         .heading p { color: #697386; line-height: 1.5; }
 
+        .daily-link { display: block; text-decoration: none; color: inherit; background: #f4f2ff; border: 1px solid #d9d3fa; border-radius: 14px; padding: 14px 18px; margin-bottom: 18px; }
+        .daily-link span { font-weight: 700; display: block; margin-bottom: 3px; }
+        .daily-link small { color: #5b47c9; font-size: 13px; line-height: 1.4; }
+        .daily-link:hover { border-color: #7562db; }
+
         /* Overall progress */
         .overall { background: white; border: 1px solid #e5e7eb; border-radius: 18px; padding: 25px; margin-bottom: 18px; }
         .overall-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -75,6 +80,11 @@
         <h1>One checklist. No stress.</h1>
         <p>Tick things off as you finish them. Your progress is saved on this device, and you don't need to log in.</p>
     </div>
+
+    <a class="daily-link" href="/daily">
+        <span>🧠 Daily Practice</span>
+        <small>Solve one English, one Reasoning and one Coding question every day, in Beginner or Advanced level →</small>
+    </a>
 
     <div class="overall">
         <div class="overall-top">
@@ -142,6 +152,66 @@ const SECTIONS = [
             ["rs6", "Internships, certificates and achievements"],
             ["rs7", "Check spelling, then save as PDF"],
             ["rs8", "Ask a senior or friend to review it"]
+        ]
+    },
+    {
+        key: "english", icon: "📚", title: "English",
+        hint: "Communication and verbal rounds decide many shortlists. Ten minutes a day is enough.",
+        items: [
+            ["en1", "Revise tenses, subject-verb agreement and articles"],
+            ["en2", "Practise prepositions and common phrasal verbs"],
+            ["en3", "Learn 5 new words a week (synonyms and antonyms)"],
+            ["en4", "Practise error spotting and sentence correction"],
+            ["en5", "Read one article or editorial and write a 3-line summary"],
+            ["en6", "Do a reading comprehension passage under 8 minutes"],
+            ["en7", "Practise active/passive voice and direct/indirect speech"],
+            ["en8", "Write a short email and a 150-word essay, then check it"],
+            ["en9", "Practise speaking: introduce yourself without filler words"]
+        ]
+    },
+    {
+        key: "reasoning", icon: "🧠", title: "Reasoning",
+        hint: "Patterns and puzzles. Speed comes from seeing the same patterns again and again.",
+        items: [
+            ["rn1", "Number and letter series"],
+            ["rn2", "Coding-decoding"],
+            ["rn3", "Blood relations"],
+            ["rn4", "Directions and distances"],
+            ["rn5", "Ranking and ordering"],
+            ["rn6", "Seating arrangements (linear and circular)"],
+            ["rn7", "Calendar and clock problems"],
+            ["rn8", "Analogies and odd one out"],
+            ["rn9", "Puzzles with a table or grid"]
+        ]
+    },
+    {
+        key: "logical", icon: "🧩", title: "Logical thinking",
+        hint: "Deduction and decision making. Read slowly, then draw a diagram.",
+        items: [
+            ["lg1", "Syllogisms (use Venn diagrams)"],
+            ["lg2", "Statement and conclusion"],
+            ["lg3", "Statement and assumption"],
+            ["lg4", "Strong and weak arguments"],
+            ["lg5", "Course of action"],
+            ["lg6", "Cause and effect"],
+            ["lg7", "Truth-teller and liar puzzles"],
+            ["lg8", "Data sufficiency"],
+            ["lg9", "Venn diagram and set problems"]
+        ]
+    },
+    {
+        key: "mental", icon: "⚡", title: "Mental ability (quick maths)",
+        hint: "Do it in your head first. Fast, accurate arithmetic saves minutes in every test.",
+        items: [
+            ["mn1", "Tables up to 20 and squares up to 30"],
+            ["mn2", "Cubes up to 15 and common square roots"],
+            ["mn3", "Percentages, fractions and their decimal values"],
+            ["mn4", "Quick multiplication tricks (x5, x9, x11, x25)"],
+            ["mn5", "Ratio, proportion and averages"],
+            ["mn6", "Profit and loss, simple and compound interest"],
+            ["mn7", "Time and work, time speed and distance"],
+            ["mn8", "Permutations, combinations and probability basics"],
+            ["mn9", "Do 10 mental-maths questions with a 5-minute timer"]
         ]
     },
     {
