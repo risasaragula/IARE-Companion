@@ -1,9 +1,13 @@
 import os
+import random
 import re
+from datetime import datetime, timedelta, timezone
 
 import pytesseract
 from flask import Flask, jsonify, render_template, request
 from PIL import Image, ImageEnhance, ImageFilter
+
+import daily_data
 
 app = Flask(__name__)
 
@@ -22,9 +26,11 @@ AI_MODEL = "claude-haiku-4-5-20251001"
 AI_SYSTEM = (
     "You are Ask IARE, a friendly assistant inside IARE Companion, a web app for students of IARE "
     "(Institute of Aeronautical Engineering). Keep answers short, clear and practical. "
-    "The app has four features: Attendance (upload a Samvidha screenshot), Calculators (SGPA, CGPA, "
+    "The app has six features: Attendance (upload a Samvidha screenshot), Calculators (SGPA, CGPA, "
     "percentage, marks needed), Discover (internships, hackathons, competitions, workshops, "
-    "scholarships, placements) and Ask IARE. When a question fits one of them, point the student to it. "
+    "scholarships, placements), Placement Prep (a checklist), Daily Practice (one English, one logical "
+    "reasoning and one coding question every day, in Beginner and Advanced levels) and Ask IARE. "
+    "When a question fits one of them, point the student to it. "
     "Do not invent IARE-specific facts (rules, dates, fees, results, contacts) or specific opportunities "
     "and deadlines. If you are not sure, say so and suggest checking Samvidha, the official IARE website "
     "or the college office. For attendance numbers use only the data provided; never guess them."
@@ -275,6 +281,62 @@ def placement():
     return render_template("placement.html")
 
 # ---------------------------------------------------------
+# DAILY PRACTICE
+# ---------------------------------------------------------
+
+IST = timezone(timedelta(hours=5, minutes=30))
+DAILY_START = datetime(2026, 1, 1, tzinfo=IST).date()
+
+
+def today_ist():
+    return datetime.now(IST).date()
+
+
+def build_question(category, level, index, date_key):
+    """Return one question with its options shuffled (the same way for everyone on a given day)."""
+    item = daily_data.BANK[category][level][index]
+    order = list(range(len(item["options"])))
+    random.Random(f"{date_key}|{category}|{level}|{index}").shuffle(order)
+    return {
+        "id": f"{category}-{level}-{index}",
+        "category": category,
+        "question": item["question"],
+        "code": item["code"],
+        "options": [item["options"][i] for i in order],
+        "answer": order.index(item["answer"]),
+        "explanation": item["explanation"],
+    }
+
+
+@app.route("/daily")
+def daily():
+    return render_template("daily.html")
+
+
+@app.route("/api/daily")
+def api_daily():
+    level = request.args.get("level", "beginner")
+    if level not in daily_data.LEVELS:
+        level = "beginner"
+    try:
+        extra = max(0, min(int(request.args.get("extra", 0)), daily_data.QUESTIONS_PER_LIST - 1))
+    except ValueError:
+        extra = 0
+
+    today = today_ist()
+    day_number = (today - DAILY_START).days
+    # Extra sets jump 7 days ahead each time. 7 and the list length (15) share no factors,
+    # so a student sees every question before any repeats.
+    index = (day_number + 7 * extra) % daily_data.QUESTIONS_PER_LIST
+    date_key = today.isoformat()
+
+    questions = [build_question(c["key"], level, index, date_key) for c in daily_data.CATEGORIES]
+    return jsonify({"success": True, "date": date_key, "level": level, "extra": extra,
+                    "set_number": index + 1, "total_sets": daily_data.QUESTIONS_PER_LIST,
+                    "categories": daily_data.CATEGORIES, "questions": questions})
+
+
+# ---------------------------------------------------------
 # UPLOAD
 # ---------------------------------------------------------
 
@@ -395,6 +457,10 @@ FAQ = [
      "Open the Discover page from the home screen. It has Internships, Hackathons, Competitions, "
      "Workshops, Scholarships and Placements. For deadlines and eligibility, always confirm on the "
      "official page of each opportunity."),
+    (("daily", "practice", "english", "reasoning", "aptitude", "coding question", "streak"),
+     "The Daily Practice page gives you three new questions every day: one English, one Logical "
+     "Reasoning and one Coding. Pick Beginner or Advanced, answer them to see the explanation, and "
+     "finish all three to build your streak. Open it from the home screen."),
     (("upload", "screenshot", "samvidha", "how to use", "how do i use"),
      "On the Attendance page, upload a clear Samvidha attendance screenshot that includes the table "
      "header (Course Code, Conducted, Attended). You get your overall attendance, subjects at risk, "
@@ -403,7 +469,8 @@ FAQ = [
      "I can help with:\n"
      "- Attendance: ask \"how many classes can I miss?\" after uploading your screenshot\n"
      "- SGPA, CGPA, percentage and marks-needed formulas\n"
-     "- Finding opportunities on the Discover page"),
+     "- Finding opportunities on the Discover page\n"
+     "- Daily Practice: English, reasoning and coding questions every day"),
 ]
 
 

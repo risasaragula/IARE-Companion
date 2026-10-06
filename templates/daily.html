@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Practice | IARE Companion</title>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f7f8fc; color: #182230; }
+        nav { height: 70px; background: white; border-bottom: 1px solid #e8ebf0; display: flex; align-items: center; justify-content: space-between; padding: 0 7%; }
+        .brand { font-size: 21px; font-weight: 700; }
+        .back { color: #667085; text-decoration: none; font-size: 14px; }
+        .container { width: 86%; max-width: 860px; margin: 42px auto; }
+        .heading { margin-bottom: 26px; }
+        .heading small { color: #7562db; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+        .heading h1 { font-size: 36px; margin: 10px 0 8px; }
+        .heading p { color: #697386; line-height: 1.5; }
+
+        /* Stats + level */
+        .top { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+        .stat { flex: 1; min-width: 140px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px 18px; }
+        .stat strong { display: block; font-size: 28px; letter-spacing: -.5px; }
+        .stat span { color: #697386; font-size: 13px; }
+
+        .levels { display: inline-flex; background: #eceaf3; border-radius: 12px; padding: 4px; margin-bottom: 18px; }
+        .levels button { border: none; background: none; padding: 10px 20px; border-radius: 9px; font-size: 14px; font-weight: 700; color: #697386; cursor: pointer; }
+        .levels button.on { background: white; color: #182230; box-shadow: 0 1px 4px rgba(24, 34, 48, .12); }
+        .levels button:focus-visible, .opt:focus-visible, .btn:focus-visible { outline: 3px solid #b9aef5; outline-offset: 2px; }
+
+        .set-info { color: #697386; font-size: 13px; margin-bottom: 14px; }
+        .bar { height: 8px; background: #eceaf3; border-radius: 10px; overflow: hidden; margin-bottom: 18px; }
+        .bar > div { height: 100%; width: 0; background: #7562db; border-radius: 10px; transition: width .3s; }
+
+        /* Question cards */
+        .card { background: white; border: 1px solid #e5e7eb; border-radius: 18px; padding: 22px; margin-bottom: 16px; }
+        .cat { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .5px; color: #5b47c9; background: #f4f2ff; border-radius: 8px; padding: 5px 9px; margin-bottom: 12px; }
+        .qtext { font-size: 17px; line-height: 1.5; font-weight: 700; white-space: pre-line; margin-bottom: 12px; }
+        pre { background: #182230; color: #e6edf7; border-radius: 12px; padding: 14px 16px; font-size: 14px; line-height: 1.55; overflow-x: auto; margin-bottom: 14px; font-family: Consolas, "Courier New", monospace; }
+
+        .opts { display: grid; gap: 9px; }
+        .opt { display: flex; gap: 12px; align-items: center; text-align: left; width: 100%; background: #f7f8fc; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 12px 14px; font-size: 15px; color: #182230; cursor: pointer; font-family: inherit; }
+        .opt:hover:not(:disabled) { border-color: #7562db; background: #f4f2ff; }
+        .opt .k { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: white; border: 1.5px solid #d5d9e0; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #697386; }
+        .opt .t { flex: 1; line-height: 1.4; white-space: pre-wrap; }
+        .opt:disabled { cursor: default; }
+        .opt.right { background: #ecfdf3; border-color: #12b76a; }
+        .opt.right .k { background: #12b76a; border-color: #12b76a; color: white; }
+        .opt.wrong { background: #fef3f2; border-color: #f04438; }
+        .opt.wrong .k { background: #f04438; border-color: #f04438; color: white; }
+
+        .why { display: none; margin-top: 14px; padding: 12px 14px; border-radius: 12px; font-size: 14px; line-height: 1.55; background: #f4f2ff; }
+        .why b { display: block; margin-bottom: 4px; }
+        .why.good b { color: #067647; }
+        .why.bad b { color: #b42318; }
+
+        /* Finish banner */
+        .done { display: none; background: #182230; color: white; border-radius: 18px; padding: 24px; margin-bottom: 16px; }
+        .done h2 { font-size: 22px; margin-bottom: 6px; }
+        .done p { color: #c9d1de; line-height: 1.5; font-size: 14px; }
+        .done .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+        .btn { border: none; border-radius: 10px; padding: 11px 18px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+        .btn.main { background: #7562db; color: white; }
+        .btn.alt { background: rgba(255, 255, 255, .12); color: white; }
+
+        .footer-row { margin-top: 22px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .footer-row p { color: #9aa1ad; font-size: 12px; line-height: 1.5; max-width: 520px; }
+        .reset { background: none; border: 1px solid #d5d9e0; color: #697386; padding: 10px 14px; border-radius: 9px; cursor: pointer; font-size: 13px; }
+        .reset:hover { border-color: #b42318; color: #b42318; }
+
+        .error { background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 22px; color: #697386; line-height: 1.5; }
+
+        @media (max-width: 600px) {
+            .heading h1 { font-size: 30px; }
+            .container { width: 92%; }
+            .card { padding: 18px; }
+        }
+        @media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="brand">IARE Companion</div>
+    <a href="/" class="back">← Back to Home</a>
+</nav>
+
+<div class="container">
+
+    <div class="heading">
+        <small>DAILY PRACTICE</small>
+        <h1>Three questions a day.</h1>
+        <p>One English, one Logical Reasoning and one Coding question, fresh every day. Answer all three to keep your streak going. Your progress is saved on this device, and you don't need to log in.</p>
+    </div>
+
+    <div class="top">
+        <div class="stat"><strong id="streak">0</strong><span>🔥 Day streak</span></div>
+        <div class="stat"><strong id="best">0</strong><span>🏆 Best streak</span></div>
+        <div class="stat"><strong id="total">0</strong><span>✅ Days completed</span></div>
+    </div>
+
+    <div class="levels" role="group" aria-label="Difficulty level">
+        <button type="button" data-level="beginner" id="lvlBeginner">Beginner</button>
+        <button type="button" data-level="advanced" id="lvlAdvanced">Advanced</button>
+    </div>
+
+    <div class="set-info" id="setInfo"></div>
+    <div class="bar"><div id="fill"></div></div>
+
+    <div id="questions"></div>
+
+    <div class="done" id="done" aria-live="polite">
+        <h2 id="doneTitle"></h2>
+        <p id="doneText"></p>
+        <div class="row">
+            <button type="button" class="btn main" id="moreBtn">Practice more</button>
+            <button type="button" class="btn alt" id="switchBtn"></button>
+        </div>
+    </div>
+
+    <div class="footer-row">
+        <p>Tip: do your three questions at the same time every day. Practice-more sets are for extra revision and don't count towards your streak.</p>
+        <button class="reset" id="resetBtn" type="button">Reset my progress</button>
+    </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const STORE = "iare_daily";
+const LABELS = "ABCD";
+
+// state.answers: "date|level|extra|questionId" -> chosen option number
+// state.days:    "date" -> { beginner: score, advanced: score }  (only the main daily set)
+let state = { answers: {}, days: {}, level: "beginner" };
+
+try {
+    const saved = JSON.parse(localStorage.getItem(STORE));
+    if (saved && typeof saved === "object") {
+        if (saved.answers && typeof saved.answers === "object") state.answers = saved.answers;
+        if (saved.days && typeof saved.days === "object") state.days = saved.days;
+        if (saved.level === "advanced") state.level = "advanced";
+    }
+} catch (e) { /* start fresh */ }
+
+function save() {
+    try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* ignore */ }
+}
+
+function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+}
+
+// ---------- streak ----------
+function shiftDate(iso, days) {
+    const d = new Date(iso + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() + days);
+    return d.toISOString().slice(0, 10);
+}
+
+function updateStats(today) {
+    const dates = Object.keys(state.days).sort();
+    const done = new Set(dates);
+
+    // current streak: counts back from today, or from yesterday if today isn't finished yet
+    let cursor = done.has(today) ? today : shiftDate(today, -1);
+    let streak = 0;
+    while (done.has(cursor)) { streak++; cursor = shiftDate(cursor, -1); }
+
+    // best streak
+    let best = 0, run = 0, prev = null;
+    dates.forEach(d => {
+        run = prev && shiftDate(prev, 1) === d ? run + 1 : 1;
+        best = Math.max(best, run);
+        prev = d;
+    });
+
+    $("streak").textContent = streak;
+    $("best").textContent = best;
+    $("total").textContent = dates.length;
+}
+
+// ---------- page ----------
+let current = null;      // data returned by the server
+let extra = 0;           // 0 = today's set, 1+ = practice-more sets
+
+const keyFor = q => [current.date, current.level, extra, q.id].join("|");
+
+function renderQuestion(q, number, categories) {
+    const cat = categories.find(c => c.key === q.category);
+    const card = el("div", "card");
+    card.append(el("span", "cat", (cat ? cat.icon + " " + cat.title : q.category).toUpperCase()));
+    card.append(el("div", "qtext", number + ". " + q.question));
+    if (q.code) card.append(el("pre", "", q.code));
+
+    const opts = el("div", "opts");
+    const why = el("div", "why");
+    why.setAttribute("aria-live", "polite");
+    const buttons = [];
+
+    const picked = state.answers[keyFor(q)];
+
+    function reveal(choice) {
+        buttons.forEach((b, i) => {
+            b.disabled = true;
+            if (i === q.answer) b.classList.add("right");
+            else if (i === choice) b.classList.add("wrong");
+        });
+        const correct = choice === q.answer;
+        why.className = "why " + (correct ? "good" : "bad");
+        why.textContent = "";
+        why.append(el("b", "", correct ? "Correct!" : "Not quite. The answer is " + LABELS[q.answer] + "."),
+                   document.createTextNode(q.explanation));
+        why.style.display = "block";
+    }
+
+    q.options.forEach((text, i) => {
+        const b = el("button", "opt");
+        b.type = "button";
+        b.append(el("span", "k", LABELS[i]), el("span", "t", text));
+        b.addEventListener("click", () => {
+            if (state.answers[keyFor(q)] !== undefined) return;
+            state.answers[keyFor(q)] = i;
+            reveal(i);
+            afterAnswer();
+        });
+        buttons.push(b);
+        opts.append(b);
+    });
+
+    card.append(opts, why);
+    if (picked !== undefined) reveal(picked);
+    return card;
+}
+
+function render() {
+    const box = $("questions");
+    box.textContent = "";
+    current.questions.forEach((q, i) => box.append(renderQuestion(q, i + 1, current.categories)));
+
+    $("lvlBeginner").classList.toggle("on", current.level === "beginner");
+    $("lvlAdvanced").classList.toggle("on", current.level === "advanced");
+    $("lvlBeginner").setAttribute("aria-pressed", current.level === "beginner");
+    $("lvlAdvanced").setAttribute("aria-pressed", current.level === "advanced");
+
+    const label = current.level === "beginner" ? "Beginner" : "Advanced";
+    $("setInfo").textContent = extra === 0
+        ? "Today's " + label + " set (" + current.date + ")"
+        : "Practice-more set " + extra + " (" + label + "). Doesn't count towards your streak.";
+
+    updateStats(current.date);
+    afterAnswer(true);
+}
+
+function afterAnswer(initial) {
+    const answered = current.questions.filter(q => state.answers[keyFor(q)] !== undefined);
+    const correct = answered.filter(q => state.answers[keyFor(q)] === q.answer).length;
+    const finished = answered.length === current.questions.length;
+
+    $("fill").style.width = (answered.length / current.questions.length * 100) + "%";
+
+    if (finished && extra === 0) {
+        state.days[current.date] = Object.assign({}, state.days[current.date], { [current.level]: correct });
+    }
+    if (!initial) save();
+
+    const done = $("done");
+    if (!finished) { done.style.display = "none"; updateStats(current.date); return; }
+
+    updateStats(current.date);
+    const other = current.level === "beginner" ? "Advanced" : "Beginner";
+    const n = current.questions.length;
+    $("doneTitle").textContent = "You got " + correct + " out of " + n + (correct === n ? " 🎉" : "");
+    $("doneText").textContent = extra === 0
+        ? "Today's set is done and your streak is safe. Come back tomorrow for three new questions, or keep practising."
+        : "Nice work. You can keep going with another set.";
+    $("switchBtn").textContent = "Try " + other + " level";
+    $("moreBtn").hidden = extra >= current.total_sets - 1;
+    done.style.display = "block";
+    if (!initial) done.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+async function load() {
+    $("questions").textContent = "";
+    $("done").style.display = "none";
+    $("setInfo").textContent = "Loading questions...";
+    try {
+        const res = await fetch("/api/daily?level=" + state.level + "&extra=" + extra);
+        const data = await res.json();
+        if (!data.success) throw new Error("bad response");
+        current = data;
+        render();
+    } catch (e) {
+        $("setInfo").textContent = "";
+        $("questions").append(el("div", "error", "Couldn't load today's questions. Check your connection, make sure the server is running and refresh the page."));
+    }
+}
+
+function setLevel(level) {
+    if (state.level === level && extra === 0) return;
+    state.level = level;
+    extra = 0;
+    save();
+    load();
+}
+
+$("lvlBeginner").addEventListener("click", () => setLevel("beginner"));
+$("lvlAdvanced").addEventListener("click", () => setLevel("advanced"));
+$("switchBtn").addEventListener("click", () => {
+    state.level = state.level === "beginner" ? "advanced" : "beginner";
+    extra = 0;
+    save();
+    load();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});
+$("moreBtn").addEventListener("click", () => {
+    extra += 1;
+    load();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});
+$("resetBtn").addEventListener("click", () => {
+    if (!confirm("Reset all your answers, streak and history on this device?")) return;
+    state = { answers: {}, days: {}, level: state.level };
+    save();
+    extra = 0;
+    load();
+});
+
+load();
+</script>
+
+</body>
+</html>
